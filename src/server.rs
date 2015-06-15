@@ -1,5 +1,5 @@
-use std::net::{TcpListener, ToSocketAddrs};
-use request::Request;
+use std::net::{TcpListener, ToSocketAddrs, Shutdown};
+use connection::Connection;
 
 pub struct Server {
     listener : TcpListener,
@@ -16,8 +16,8 @@ impl Server {
     pub fn serve(&self) {
         for conn in self.listener.incoming() {
             match conn {
-                Ok(stream) => { Request::new(&stream).respond(); }
-                Err(_e) => {}
+                Ok(mut stream) => { Connection::new(&mut stream).handle(); }
+                Err(error)     => { panic!("{}", error); }
             }
         }
     }
